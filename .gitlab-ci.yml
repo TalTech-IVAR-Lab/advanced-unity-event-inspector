@@ -1,0 +1,48 @@
+stages:
+  - release
+
+semantic-release:
+  image: node:14
+  stage: release
+  only:
+    refs:
+    - main
+    - preview
+    # This matches maintenance branches
+    - /^(([0-9]+)\.)?([0-9]+)\.x/
+    # This matches pre-releases
+    - /^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+  script:
+    # join ZeroTier Network
+    - apt install gpg
+    - curl -s 'https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg' | gpg --import && if z=$(curl -s 'https://install.zerotier.com/' | gpg); then echo "$z" | bash; fi
+    - zerotier-cli join $ZEROTIER_NETWORK_ID
+    # install dependencies
+    - > 
+      npm install --no-save
+      @semantic-release/exec
+      @semantic-release/npm
+      @semantic-release/git
+      @semantic-release/gitlab
+      @semantic-release/changelog
+      @commitlint/cli
+      @commitlint/config-conventional
+    # run semantic-release
+    - npx semantic-release
+
+# publish-to-verdaccio:
+#   image: node:14
+#   stage: deploy
+#   only:
+#     - tags
+#     - triggers
+#   script:
+#     # join ZeroTier Network
+#     - apt install gpg
+#     - curl -s 'https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg' | gpg --import && if z=$(curl -s 'https://install.zerotier.com/' | gpg); then echo "$z" | bash; fi
+#     - zerotier-cli join $ZEROTIER_NETWORK_ID
+#     # publish package to Verdaccio registry
+#     #    login command from: https://stackoverflow.com/questions/54540096/give-credentials-to-npm-login-command-line
+#     - npm install -g npm-cli-login 
+#     - npm-cli-login -u $VERDACCIO_USER -p $VERDACCIO_PASS -e $VERDACCIO_EMAIL -r $VERDACCIO_SERVER
+#     - npm --registry $VERDACCIO_SERVER publish
