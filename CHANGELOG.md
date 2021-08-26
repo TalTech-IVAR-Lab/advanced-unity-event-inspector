@@ -1,3 +1,10 @@
+## [1.0.0](https://gitlab.com/NoSoySauce_Games/ReorderableUnityEvents/compare/...v1.0.0) (2021-08-26)
+
+
+### 🚀 Features
+
+* Add all files ([e512666](https://gitlab.com/NoSoySauce_Games/ReorderableUnityEvents/commit/e51266659a3a17cab5fccadef4dfd8e73fa2f3f8))
+
 ## [3.7.0](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/compare/v3.6.0...v3.7.0) (2021-08-25)
 
 
