@@ -1,3 +1,10 @@
+### [1.0.1](https://gitlab.com/NoSoySauce_Games/ReorderableUnityEvents/compare/v1.0.0...v1.0.1) (2021-08-26)
+
+
+### 🛠 Fixes
+
+* Update package author name ([f83c513](https://gitlab.com/NoSoySauce_Games/ReorderableUnityEvents/commit/f83c513bd9919e8a4cd01ca8ba534de636d1ba48))
+
 ## [1.0.0](https://gitlab.com/NoSoySauce_Games/ReorderableUnityEvents/compare/...v1.0.0) (2021-08-26)
 
 
