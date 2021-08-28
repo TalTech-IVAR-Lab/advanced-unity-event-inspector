@@ -1085,11 +1085,11 @@
             }
             
             // Debug callback
-            if (false) // TODO: disable this menu item when one debugger callback is already present
-            {
-                menu.AddDisabledItem(new GUIContent("Add Debug Callback"));
-            }
-            else
+            // if (false) // TODO: disable this menu item when one debugger callback is already present
+            // {
+            //     menu.AddDisabledItem(new GUIContent("Add Debug Callback"));
+            // }
+            // else
             {
                 menu.AddItem(new GUIContent("Add Debug Callback"), false, AddDebugger);
             }
@@ -1110,37 +1110,16 @@
                 debugger = candidateDebugger;
             }
             
-            // If no debugger found, instantiate it from a prefab
+            // If no debugger found, create it manually
             if (debugger == null)
             {
-                // Try to load debugger prefab from Resources
-                var debuggerPrefab = Resources.Load<GameObject>("Debug Logger");
-                if (debuggerPrefab == null)
+                var debuggerObject = new GameObject("Unity Event Debugger")
                 {
-                    Debug.LogError("Could not load UnityEvent debugger prefab from Resources. Please add debugger to the Scene manually.");
-                    return;
-                }
+                    hideFlags = HideFlags.NotEditable
+                };
+                debugger = debuggerObject.AddComponent<UnityEventDebugger>();
                 
-                // Instantiate debugger 
-                var debuggerObject = GameObject.Instantiate(debuggerPrefab);
-                debuggerObject.hideFlags = HideFlags.NotEditable;
-                debugger = debuggerObject.GetComponent<UnityEventDebugger>();
-
-                if (debugger == null)
-                {
-                    Debug.LogError($"Instantiated UnityEvent debugger prefab does not have debugger script on it. Please make sure that no duplicate prefab exists with the name ('{debuggerPrefab.name}').");
-                    if (Application.isPlaying)
-                    {
-                        GameObject.Destroy(debugger);
-                    }
-                    else
-                    {
-                        GameObject.DestroyImmediate(debuggerObject);
-                    }
-                    return;
-                }
-                
-                // Get scene this UnityEvent belongs to and move debugger to the same scene
+                // Move debugger to the scene this UnityEvent belongs to
                 SceneManager.MoveGameObjectToScene(debuggerObject, eventScene);
             }
             
