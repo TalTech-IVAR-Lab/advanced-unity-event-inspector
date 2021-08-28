@@ -1,3 +1,15 @@
+### [1.0.2](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/compare/v1.0.1...v1.0.2) (2021-08-28)
+
+
+### 📔 Docs
+
+* Update README ([7d96424](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/commit/7d96424c42c42d4339136ca8b78144919ab286f3))
+
+
+### 🛠 Fixes
+
+* Remove redundant prefab for UnityEventDebugger ([51d4e16](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/commit/51d4e16162f8696091e75535d9aeb49445e54129))
+
 ### [1.0.1](https://gitlab.com/NoSoySauce_Games/ReorderableUnityEvents/compare/v1.0.0...v1.0.1) (2021-08-26)
 
 
