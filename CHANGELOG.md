@@ -1,3 +1,15 @@
+### [1.0.3](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/compare/v1.0.2...v1.0.3) (2021-08-30)
+
+
+### 📔 Docs
+
+* Remove redundant entries from changelog ([2164e4b](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/commit/2164e4b43e0f7d3fe23bf500ce0e1a4e0dc695cc))
+
+
+### 🛠 Fixes
+
+* Fix assembly definition files ([5591d71](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/commit/5591d7136db6887097d6ee64b8759bc91705c8cd))
+
 ### [1.0.2](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/compare/v1.0.1...v1.0.2) (2021-08-28)
 
 
