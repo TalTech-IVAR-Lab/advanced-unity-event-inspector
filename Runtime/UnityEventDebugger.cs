@@ -1,11 +1,8 @@
 ﻿namespace Games.NoSoySauce.DeveloperTools.Components
 {
-    using System;
     using System.Diagnostics;
     using UnityEngine;
-    using Malimbe.BehaviourStateRequirementMethod;
     using Debug = UnityEngine.Debug;
-    using Object = UnityEngine.Object;
 
     /// <summary>
     /// Provides simple methods which can be hooked up to Unity events for quick debugging in Editor.
@@ -18,80 +15,40 @@
             // Here just to make component toggleable.
         }
 
-        [RequiresBehaviourState]
-        public void LogString(string message)
+        public void LogString(string message) { Log(message); }
+
+        public void LogBool(bool value) { Log(value); }
+
+        public void LogFloat(float value) { Log(value); }
+
+        public void LogVector2(Vector2 value) { Log(value); }
+
+        public void LogVector3(Vector3 value) { Log(value); }
+
+        public void LogPose(Pose value) { Log($"{value.position.ToString("F3")}{value.rotation.eulerAngles.ToString("F3")}"); }
+
+        public void LogObject(GameObject gameObject) { Log(gameObject.ToString()); }
+
+        public void LogComponent(Component component) { Log(component.ToString()); }
+
+        public void LogFrameAndTime() { Log($"Frame {Time.frameCount} ({Time.realtimeSinceStartup:n2} s since startup)"); }
+
+        private void Log(object message)
         {
-            Log(message, this);
+            if (!enabled) return;
+
+            Debug.Log($"{message}\nSource: '{GetCallerName(5)}'", this);
         }
 
-        [RequiresBehaviourState]
-        public void LogString(string message, Object context)
-        {
-            Log(message, context);
-        }
-
-        [RequiresBehaviourState]
-        public void LogBool(bool value)
-        {
-            Log(value, this);
-        }
-
-        [RequiresBehaviourState]
-        public void LogFloat(float value)
-        {
-            Log(value, this);
-        }
-
-        [RequiresBehaviourState]
-        public void LogVector2(Vector2 value)
-        {
-            Log(value, this);
-        }
-
-        [RequiresBehaviourState]
-        public void LogVector3(Vector3 value)
-        {
-            Log(value, this);
-        }
-
-        [RequiresBehaviourState]
-        public void LogPose(Pose value)
-        {
-            Log($"{value.position.ToString("F3")}{value.rotation.eulerAngles.ToString("F3")}", this);
-        }
-
-        [RequiresBehaviourState]
-        public void LogObject(GameObject gameObject)
-        {
-            Log(gameObject.ToString(), this);
-        }
-
-        [RequiresBehaviourState]
-        public void LogComponent(Component component)
-        {
-            Log(component.ToString(), this);
-        }
-
-        [RequiresBehaviourState]
-        public void LogFrameAndTime()
-        {
-            Log($"Frame {Time.frameCount} ({Time.realtimeSinceStartup:n2} s since startup)", this);
-        }
-
-        private static void Log(object message, Object context)
-        {
-            Debug.Log($"{message}\nSource: '{GetCallerName(5)}'", context);
-        }
-        
         private static string GetCallerName(int level = 2)
         {
             var m = new StackTrace().GetFrame(level).GetMethod();
 
             // .Name is the name only, .FullName includes the namespace
-            var className = m.ReflectedType?.FullName;
+            string className = m.ReflectedType?.FullName;
 
             //the method/function name you are looking for.
-            var methodName = m.Name;
+            string methodName = m.Name;
 
             //returns a composite of the namespace, class and method name.
             return $"{className}.{methodName}";

@@ -14,8 +14,6 @@
     "email": "zekbond@gmail.com",
     "url": "https://github.com/JGroxz"
   },
-  "dependencies": {
-    "io.extendreality.malimbe": "9.6.6"
-  },
+  "dependencies": {},
   "hideInEditor": false
 }
