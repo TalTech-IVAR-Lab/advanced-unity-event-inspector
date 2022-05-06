@@ -1,6 +1,6 @@
 {
   "name": "games.nosoysauce.reorderableunityevents",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "displayName": "Reorderable Unity Events",
   "description": "Makes Unity Events callbacks reorderable and allows to copy, cut and paste them between events in the Inspector.",
   "unity": "2019.1",

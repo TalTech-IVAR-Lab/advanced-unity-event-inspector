@@ -1,3 +1,10 @@
+### [1.0.4](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/compare/v1.0.3...v1.0.4) (2022-05-06)
+
+
+### 🛠 Fixes
+
+* Remove Malimbe package dependency ([c826ad4](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/commit/c826ad4a84565a0c144416e99085d980dfa563df))
+
 ### [1.0.3](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/compare/v1.0.2...v1.0.3) (2021-08-30)
 
 
