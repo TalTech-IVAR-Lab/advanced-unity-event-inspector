@@ -1,3 +1,10 @@
+## [1.1.0](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/compare/v1.0.4...v1.1.0) (2022-05-12)
+
+
+### 🚀 Features
+
+* Add type sections to callback selection menu ([4d1f16b](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/commit/4d1f16b8a7c4e06c348ca7425823c74b44595a37))
+
 ### [1.0.4](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/compare/v1.0.3...v1.0.4) (2022-05-06)
 
 
