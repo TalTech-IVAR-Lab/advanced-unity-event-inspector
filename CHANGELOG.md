@@ -1,3 +1,15 @@
+## [1.2.0](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/compare/v1.1.0...v1.2.0) (2022-05-20)
+
+
+### ✂ Refactor
+
+* Update internal variables naming ([7657680](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/commit/7657680982844779ebab6d3e672210d66abe5799))
+
+
+### 🚀 Features
+
+* Add ThrowNotImplemented() method to UnityEventDebugger ([8f779bb](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/commit/8f779bbe69f6de7b8e2097904cb63833cd1661a5))
+
 ## [1.1.0](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/compare/v1.0.4...v1.1.0) (2022-05-12)
 
 
