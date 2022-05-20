@@ -1,5 +1,6 @@
 ﻿namespace Games.NoSoySauce.DeveloperTools.Components
 {
+    using System;
     using System.Diagnostics;
     using UnityEngine;
     using Debug = UnityEngine.Debug;
@@ -33,6 +34,8 @@
 
         public void LogFrameAndTime() { Log($"Frame {Time.frameCount} ({Time.realtimeSinceStartup:n2} s since startup)"); }
 
+        public void ThrowNotImplemented(string message) { throw new NotImplementedException(message); }
+        
         private void Log(object message)
         {
             if (!enabled) return;
