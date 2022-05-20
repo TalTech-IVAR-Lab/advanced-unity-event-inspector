@@ -80,7 +80,7 @@
 
         private static readonly Color FocusedColor = new Color(0.172549f, 0.3647059f, 0.5294118f);
 
-        private const string NoCallbackString = "No Callback";
+        private const string NoFunctionSelectedString = "No Function";
         
         #endregion
 
@@ -715,7 +715,7 @@
                 if (EditorGUI.showMixedValue) { buttonContent = new GUIContent("\u2014", "Mixed Values"); }
                 else
                 {
-                    if (serializedTarget.objectReferenceValue == null || string.IsNullOrEmpty(serializedMethod.stringValue)) buttonContent = new GUIContent(NoCallbackString);
+                    if (serializedTarget.objectReferenceValue == null || string.IsNullOrEmpty(serializedMethod.stringValue)) buttonContent = new GUIContent(NoFunctionSelectedString);
                     else buttonContent = new GUIContent(GetFunctionDisplayName(serializedTarget, serializedMethod, mode, argType, CachedSettings.argumentTypeDisplayed));
                 }
 
@@ -1264,7 +1264,7 @@
         /// <returns></returns>
         protected string GetFunctionDisplayName(SerializedProperty objectProperty, SerializedProperty methodProperty, PersistentListenerMode listenerMode, Type argType, bool showArg)
         {
-            string methodNameOut = NoCallbackString;
+            string methodNameOut = NoFunctionSelectedString;
 
             if (objectProperty.objectReferenceValue == null || methodProperty.stringValue == "") return methodNameOut;
 
@@ -1359,7 +1359,7 @@
 
             string currentMethodName = elementProperty.FindPropertyRelative("m_MethodName").stringValue;
 
-            menu.AddItem(new GUIContent(NoCallbackString), string.IsNullOrEmpty(currentMethodName), ClearEventFunctionCallback, new FunctionData(elementProperty));
+            menu.AddItem(new GUIContent(NoFunctionSelectedString), string.IsNullOrEmpty(currentMethodName), ClearEventFunctionCallback, new FunctionData(elementProperty));
             menu.AddSeparator("");
 
             if (targetObj is Component) { targetObj = (targetObj as Component).gameObject; }
