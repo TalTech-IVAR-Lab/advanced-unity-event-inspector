@@ -20,8 +20,8 @@
     /// <summary>
     ///     Displays a custom reorderable inspector collection in a collapsible drawer.
     /// </summary>
-    [CustomPropertyDrawer(typeof(UnityEventBase), true), 
-     CustomPropertyDrawer(typeof(UnityEvent), true), 
+    [CustomPropertyDrawer(typeof(UnityEventBase), true),
+     CustomPropertyDrawer(typeof(UnityEvent), true),
      CustomPropertyDrawer(typeof(UnityEvent<>), true),
      CustomPropertyDrawer(typeof(UnityEvent<BaseEventData>), true)]
     public class ReorderableUnityEventDrawer : PropertyDrawer
@@ -77,9 +77,11 @@
         #region Static Fields
 
         private static ReorderableUnityEventHandler.ReorderableUnityEventSettings CachedSettings;
-        
-        private static Color FocusedColor = new Color(0.172549f, 0.3647059f, 0.5294118f);
 
+        private static readonly Color FocusedColor = new Color(0.172549f, 0.3647059f, 0.5294118f);
+
+        private const string NoFunctionSelectedString = "No Function";
+        
         #endregion
 
         #region Static Methods (UnityEvent Logic)
@@ -98,10 +100,8 @@
         {
             foreach (object target in targets)
             {
-                if (argValue != null)
-                    method.Invoke(target, new[] {argValue});
-                else
-                    method.Invoke(target, new object[] { });
+                if (argValue != null) method.Invoke(target, new[] { argValue });
+                else method.Invoke(target, new object[] { });
             }
         }
 
@@ -126,15 +126,13 @@
 
             serializedTarget.objectReferenceValue = functionData.targetObject;
             serializedMethodName.stringValue = functionData.targetMethod.Name;
-            serializedMode.enumValueIndex = (int) functionData.listenerMode;
+            serializedMode.enumValueIndex = (int)functionData.listenerMode;
 
             if (functionData.listenerMode == PersistentListenerMode.Object)
             {
                 ParameterInfo[] methodParams = functionData.targetMethod.GetParameters();
-                if (methodParams.Length == 1 && typeof(Object).IsAssignableFrom(methodParams[0].ParameterType))
-                    serializedArgAssembly.stringValue = methodParams[0].ParameterType.AssemblyQualifiedName;
-                else
-                    serializedArgAssembly.stringValue = typeof(Object).AssemblyQualifiedName;
+                if (methodParams.Length == 1 && typeof(Object).IsAssignableFrom(methodParams[0].ParameterType)) serializedArgAssembly.stringValue = methodParams[0].ParameterType.AssemblyQualifiedName;
+                else serializedArgAssembly.stringValue = typeof(Object).AssemblyQualifiedName;
             }
             else
             {
@@ -143,8 +141,7 @@
             }
 
             Type argType = ReorderableUnityEventHandler.FindTypeInAllAssemblies(serializedArgAssembly.stringValue);
-            if (!typeof(Object).IsAssignableFrom(argType) || !argType.IsInstanceOfType(serializedArgObjectValue.objectReferenceValue))
-                serializedArgObjectValue.objectReferenceValue = null;
+            if (!typeof(Object).IsAssignableFrom(argType) || !argType.IsInstanceOfType(serializedArgObjectValue.objectReferenceValue)) serializedArgObjectValue.objectReferenceValue = null;
 
             functionData.listenerElement.serializedObject.ApplyModifiedProperties();
         }
@@ -157,7 +154,7 @@
         {
             var functionData = (FunctionData)functionUserData;
 
-            functionData.listenerElement.FindPropertyRelative("m_Mode").enumValueIndex = (int) PersistentListenerMode.Void;
+            functionData.listenerElement.FindPropertyRelative("m_Mode").enumValueIndex = (int)PersistentListenerMode.Void;
             functionData.listenerElement.FindPropertyRelative("m_MethodName").stringValue = null;
             functionData.listenerElement.serializedObject.ApplyModifiedProperties();
         }
@@ -174,10 +171,10 @@
             SerializedProperty serializedMode = serialiedListener.FindPropertyRelative("m_Mode");
             SerializedProperty serializedArgs = serialiedListener.FindPropertyRelative("m_Arguments");
 
-            serializedCallState.enumValueIndex = (int) UnityEventCallState.RuntimeOnly;
+            serializedCallState.enumValueIndex = (int)UnityEventCallState.RuntimeOnly;
             serializedTarget.objectReferenceValue = null;
             serializedMethodName.stringValue = null;
-            serializedMode.enumValueIndex = (int) PersistentListenerMode.Void;
+            serializedMode.enumValueIndex = (int)PersistentListenerMode.Void;
 
             serializedArgs.FindPropertyRelative("m_IntArgument").intValue = 0;
             serializedArgs.FindPropertyRelative("m_FloatArgument").floatValue = 0f;
@@ -227,7 +224,7 @@
             return rects;
         }
 
-#if UNITY_2018_4_OR_NEWER
+    #if UNITY_2018_4_OR_NEWER
         /// <summary>
         ///     TODO: docs
         /// </summary>
@@ -236,8 +233,7 @@
         private static UnityEventBase GetDummyEvent(SerializedProperty property)
         {
             Object targetObject = property.serializedObject.targetObject;
-            if (targetObject == null)
-                return new UnityEvent();
+            if (targetObject == null) return new UnityEvent();
 
             UnityEventBase dummyEvent = null;
             Type targetType = targetObject.GetType();
@@ -266,35 +262,29 @@
 
             while (propertyPath.Length > 0)
             {
-                if (propertyPath.StartsWith("."))
-                    propertyPath = propertyPath.Substring(1);
+                if (propertyPath.StartsWith(".")) propertyPath = propertyPath.Substring(1);
 
-                string[] splitPath = propertyPath.Split(new[] {'.'}, 2);
+                string[] splitPath = propertyPath.Split(new[] { '.' }, 2);
 
                 FieldInfo newField = propertyType.GetField(splitPath[0], bindingFlags);
 
-                if (newField == null)
-                    break;
+                if (newField == null) break;
 
                 propertyType = newField.FieldType;
-                if (propertyType.IsArray)
-                    propertyType = propertyType.GetElementType();
+                if (propertyType.IsArray) propertyType = propertyType.GetElementType();
                 else if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>)) propertyType = propertyType.GetGenericArguments()[0];
 
-                if (splitPath.Length == 1)
-                    break;
+                if (splitPath.Length == 1) break;
 
                 propertyPath = splitPath[1];
-                if (propertyPath.StartsWith("Array.data["))
-                    propertyPath = propertyPath.Split(new[] {']'}, 2)[1];
+                if (propertyPath.StartsWith("Array.data[")) propertyPath = propertyPath.Split(new[] { ']' }, 2)[1];
             }
 
-            if (propertyType.IsSubclassOf(typeof(UnityEventBase)))
-                dummyEvent = Activator.CreateInstance(propertyType) as UnityEventBase;
+            if (propertyType.IsSubclassOf(typeof(UnityEventBase))) dummyEvent = Activator.CreateInstance(propertyType) as UnityEventBase;
 
             return dummyEvent;
         }
-#endif
+    #endif
 
         /// <summary>
         ///     Gets object type corresponding to the given <see cref="PersistentListenerMode" />.
@@ -309,15 +299,15 @@
                 case PersistentListenerMode.Void:
                     return new Type[] { };
                 case PersistentListenerMode.Object:
-                    return new[] {typeof(Object)};
+                    return new[] { typeof(Object) };
                 case PersistentListenerMode.Int:
-                    return new[] {typeof(int)};
+                    return new[] { typeof(int) };
                 case PersistentListenerMode.Float:
-                    return new[] {typeof(float)};
+                    return new[] { typeof(float) };
                 case PersistentListenerMode.String:
-                    return new[] {typeof(string)};
+                    return new[] { typeof(string) };
                 case PersistentListenerMode.Bool:
-                    return new[] {typeof(bool)};
+                    return new[] { typeof(bool) };
             }
 
             return new Type[] { };
@@ -340,10 +330,8 @@
 
             Type[] argTypes;
 
-            if (listenerMode == PersistentListenerMode.EventDefined && customArgTypes != null)
-                argTypes = customArgTypes;
-            else
-                argTypes = GetTypeForListenerMode(listenerMode);
+            if (listenerMode == PersistentListenerMode.EventDefined && customArgTypes != null) argTypes = customArgTypes;
+            else argTypes = GetTypeForListenerMode(listenerMode);
 
             var foundMethods = new List<MethodInfo>();
 
@@ -361,12 +349,10 @@
             foreach (MethodInfo methodInfo in foundMethods)
             {
                 // Sadly we can only use functions with void return type since C# throws an error
-                if (methodInfo.ReturnType != typeof(void))
-                    continue;
+                if (methodInfo.ReturnType != typeof(void)) continue;
 
                 ParameterInfo[] methodParams = methodInfo.GetParameters();
-                if (methodParams.Length != argTypes.Length)
-                    continue;
+                if (methodParams.Length != argTypes.Length) continue;
 
                 bool isValidParamMatch = true;
                 for (int i = 0; i < methodParams.Length; i++)
@@ -375,11 +361,9 @@
                     if (listenerMode == PersistentListenerMode.Object && argTypes[i].IsAssignableFrom(methodParams[i].ParameterType)) isValidParamMatch = true;
                 }
 
-                if (!isValidParamMatch)
-                    continue;
+                if (!isValidParamMatch) continue;
 
-                if (!CachedSettings.privateMembersShown && methodInfo.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
-                    continue;
+                if (!CachedSettings.privateMembersShown && methodInfo.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0) continue;
 
 
                 var foundMethodData = new FunctionData(null, targetObject, methodInfo, listenerMode);
@@ -399,14 +383,10 @@
         /// <returns>String name of the given <see cref="Type" />.</returns>
         protected static string GetTypeName(Type typeToName)
         {
-            if (typeToName == typeof(float))
-                return "float";
-            if (typeToName == typeof(bool))
-                return "bool";
-            if (typeToName == typeof(int))
-                return "int";
-            if (typeToName == typeof(string))
-                return "string";
+            if (typeToName == typeof(float)) return "float";
+            if (typeToName == typeof(bool)) return "bool";
+            if (typeToName == typeof(int)) return "int";
+            if (typeToName == typeof(string)) return "string";
 
             return typeToName.Name;
         }
@@ -486,13 +466,13 @@
             PrepareState(property);
 
             HandleKeyboardShortcuts();
-            
+
             // We cannot draw listeners if dummyEvent is not initialized
             if (dummyEvent == null) return;
 
             // Draw header foldout
             DrawEventFoldout(position, property);
-            
+
             // Draw the list of listeners if the event is expanded
             if (property.isExpanded && ListenersList != null)
             {
@@ -503,7 +483,7 @@
                 GUI.SetNextControlName($"bubbles {this.GetHashCode()}");
                 ListenersList.DoList(position);
                 EditorGUI.indentLevel = oldIndent;
-                
+
                 // Make list grab focus if it is empty and the user clicked into it
                 DrawEmptyListFocusableArea(position);
             }
@@ -518,8 +498,7 @@
             PrepareState(property);
 
             float height = 0f;
-            if (ListenersList != null)
-                height = ListenersList.GetHeight();
+            if (ListenersList != null) height = ListenersList.GetHeight();
 
             return height;
         }
@@ -527,9 +506,9 @@
         #endregion
 
         #region Methods (Drawing ReorderableList)
-        
+
         // This region contains methods which actually draw the collapsible UnityEvent and a reorderable list of all its listeners in the Inspector.
-        
+
         /// <summary>
         /// Draws an empty focusable area over an empty ReorderableList so that it can get in focus even without any elements in it.
         /// </summary>
@@ -539,8 +518,8 @@
         /// <param name="position">Position of this UnityEvent PropertyDrawer.</param>
         private void DrawEmptyListFocusableArea(Rect position)
         {
-            if (ListenersList.count > 0) return; 
-            
+            if (ListenersList.count > 0) return;
+
             // Capture mouse clicks in the area to make list focused
             int horizontalOffset = 2;
             int verticalOffset = 2;
@@ -554,7 +533,7 @@
                     ListenersList.GrabKeyboardFocus();
                 }
             }
-                   
+
             // Draw the area itself if the list is focused 
             if (ListenersList.HasKeyboardControl())
             {
@@ -563,7 +542,7 @@
                 var emptyListLabelRect = new Rect(focusAreaRect.x + 5, focusAreaRect.y, focusAreaRect.width, focusAreaRect.height);
                 EditorGUI.LabelField(emptyListLabelRect, "List is Empty", EditorStyles.label);
             }
-            
+
             // Context menu is available for empty list
             HandleContextMenu(focusAreaRect, 0);
         }
@@ -621,7 +600,7 @@
 
             rect.y++;
             var rects = GetEventListenerRects(rect);
-                
+
             // Context menu
             HandleContextMenu(rect, index);
 
@@ -659,16 +638,15 @@
                         // If these are Unity components then the game object that they are attached to may have multiple copies of the same component type so attempt to match the count
                         if (typeof(Component).IsAssignableFrom(oldTargetObject.GetType()) && newTargetObject.GetType() == typeof(GameObject))
                         {
-                            GameObject oldParentObject = ((Component) oldTargetObject).gameObject;
-                            var newParentObject = (GameObject) newTargetObject;
+                            GameObject oldParentObject = ((Component)oldTargetObject).gameObject;
+                            var newParentObject = (GameObject)newTargetObject;
 
                             Component[] oldComponentList = oldParentObject.GetComponents(oldTargetObject.GetType());
 
                             int componentLocationOffset = 0;
                             foreach (var oldComponent in oldComponentList)
                             {
-                                if (oldComponent == oldTargetObject)
-                                    break;
+                                if (oldComponent == oldTargetObject) break;
 
                                 if (oldComponent.GetType() == oldTargetObject.GetType())
                                     // Only take exact matches for component type since I don't want to do redo the reflection to find the methods at the moment.
@@ -681,19 +659,16 @@
                             int componentCount = -1;
                             for (int i = 0; i < newComponentList.Length; ++i)
                             {
-                                if (componentCount == componentLocationOffset)
-                                    break;
+                                if (componentCount == componentLocationOffset) break;
 
                                 if (newComponentList[i].GetType() != oldTargetObject.GetType()) continue;
-                                
+
                                 newComponentIndex = i;
                                 componentCount++;
                             }
 
-                            if (newComponentList.Length > 0 && newComponentList[newComponentIndex].GetType() == oldTargetObject.GetType())
-                                serializedTarget.objectReferenceValue = newComponentList[newComponentIndex];
-                            else
-                                serializedMethod.stringValue = null;
+                            if (newComponentList.Length > 0 && newComponentList[newComponentIndex].GetType() == oldTargetObject.GetType()) serializedTarget.objectReferenceValue = newComponentList[newComponentIndex];
+                            else serializedMethod.stringValue = null;
                         }
                         else { serializedMethod.stringValue = null; }
                     }
@@ -701,11 +676,10 @@
                 else { serializedMethod.stringValue = null; }
             }
 
-            var mode = (PersistentListenerMode) serializedMode.enumValueIndex;
+            var mode = (PersistentListenerMode)serializedMode.enumValueIndex;
 
             SerializedProperty argument;
-            if (serializedTarget.objectReferenceValue == null || string.IsNullOrEmpty(serializedMethod.stringValue))
-                mode = PersistentListenerMode.Void;
+            if (serializedTarget.objectReferenceValue == null || string.IsNullOrEmpty(serializedMethod.stringValue)) mode = PersistentListenerMode.Void;
 
             switch (mode)
             {
@@ -722,15 +696,13 @@
 
             string argTypeName = serializedArgs.FindPropertyRelative("m_ObjectArgumentAssemblyTypeName").stringValue;
             Type argType = typeof(Object);
-            if (!string.IsNullOrEmpty(argTypeName))
-                argType = ReorderableUnityEventHandler.FindTypeInAllAssemblies(argTypeName) ?? typeof(Object);
+            if (!string.IsNullOrEmpty(argTypeName)) argType = ReorderableUnityEventHandler.FindTypeInAllAssemblies(argTypeName) ?? typeof(Object);
 
             if (mode == PersistentListenerMode.Object)
             {
                 EditorGUI.BeginChangeCheck();
                 Object result = EditorGUI.ObjectField(argRect, GUIContent.none, argument.objectReferenceValue, argType, true);
-                if (EditorGUI.EndChangeCheck())
-                    argument.objectReferenceValue = result;
+                if (EditorGUI.EndChangeCheck()) argument.objectReferenceValue = result;
             }
             else if (mode != PersistentListenerMode.Void && mode != PersistentListenerMode.EventDefined) { EditorGUI.PropertyField(argRect, argument, GUIContent.none); }
 
@@ -743,10 +715,8 @@
                 if (EditorGUI.showMixedValue) { buttonContent = new GUIContent("\u2014", "Mixed Values"); }
                 else
                 {
-                    if (serializedTarget.objectReferenceValue == null || string.IsNullOrEmpty(serializedMethod.stringValue))
-                        buttonContent = new GUIContent("No Function");
-                    else
-                        buttonContent = new GUIContent(GetFunctionDisplayName(serializedTarget, serializedMethod, mode, argType, CachedSettings.argumentTypeDisplayed));
+                    if (serializedTarget.objectReferenceValue == null || string.IsNullOrEmpty(serializedMethod.stringValue)) buttonContent = new GUIContent(NoFunctionSelectedString);
+                    else buttonContent = new GUIContent(GetFunctionDisplayName(serializedTarget, serializedMethod, mode, argType, CachedSettings.argumentTypeDisplayed));
                 }
 
                 if (GUI.Button(functionRect, buttonContent, EditorStyles.popup)) BuildPopupMenu(serializedTarget.objectReferenceValue, element /*, argType*/).DropDown(functionRect);
@@ -760,10 +730,7 @@
         ///     Called when a listener of the UnityEvent becomes selected.
         /// </summary>
         /// <param name="list">Reorderable list which sent the callback.</param>
-        protected virtual void SelectEventListenerCallback(ReorderableList list)
-        {
-            currentState.lastSelectedIndex = list.index;
-        }
+        protected virtual void SelectEventListenerCallback(ReorderableList list) { currentState.lastSelectedIndex = list.index; }
 
         /// <summary>
         ///     Called when a new listener gets added to UnityEvent.
@@ -798,10 +765,7 @@
         ///     Called when listeners of UnityEvent get reordered.
         /// </summary>
         /// <param name="list">Reorderable list which sent the callback.</param>
-        protected virtual void ReorderCallback(ReorderableList list)
-        {
-            currentState.lastSelectedIndex = list.index;
-        }
+        protected virtual void ReorderCallback(ReorderableList list) { currentState.lastSelectedIndex = list.index; }
 
         /// <summary>
         ///     Called when a listener gets removed from UnityEvent.
@@ -810,13 +774,13 @@
         protected virtual void RemoveCallback(ReorderableList list)
         {
             if (ListenersList.count <= 0) return;
-            
+
             ReorderableList.defaultBehaviours.DoRemoveButton(list);
             currentState.lastSelectedIndex = list.index;
         }
 
         #endregion
-        
+
         #region Methods (Clipboard)
 
         // This region contains clipboard functionality for copying, cutting and pasting event listeners between UnityEvents.
@@ -827,12 +791,12 @@
         private static class EventListenerClipboardStorage
         {
             private static EventListenerData CopiedEventListenerData;
-            
+
             /// <summary>
             /// True if the clipboard is empty, false otherwise.
             /// </summary>
             public static bool IsEmpty => CopiedEventListenerData == null;
-            
+
             /// <summary>
             /// Stores event listener data from the given listener in the clipboard.
             /// </summary>
@@ -862,7 +826,7 @@
             public static void Extract(SerializedProperty targetListenerProperty)
             {
                 if (CopiedEventListenerData == null) return;
-                
+
                 targetListenerProperty.FindPropertyRelative("m_CallState").enumValueIndex = CopiedEventListenerData.callState;
                 targetListenerProperty.FindPropertyRelative("m_Target").objectReferenceValue = CopiedEventListenerData.target;
                 targetListenerProperty.FindPropertyRelative("m_MethodName").stringValue = CopiedEventListenerData.methodName;
@@ -876,9 +840,8 @@
                 targetArgs.FindPropertyRelative("m_StringArgument").stringValue = CopiedEventListenerData.stringArgument;
                 targetArgs.FindPropertyRelative("m_ObjectArgument").objectReferenceValue = CopiedEventListenerData.objectArgument;
                 targetArgs.FindPropertyRelative("m_ObjectArgumentAssemblyTypeName").stringValue = CopiedEventListenerData.objectArgumentAssemblyTypeName;
-
             }
-            
+
             /// <summary>
             /// Struct to store data of a single <see cref="UnityEvent"/> listener.
             /// </summary>
@@ -909,7 +872,7 @@
         private void HandleCopy()
         {
             if (ListenersList.count == 0) return;
-            
+
             int listenerIndex = ListenersList.index;
             EventListenerClipboardStorage.Store(listenerArray.GetArrayElementAtIndex(listenerIndex));
         }
@@ -923,15 +886,15 @@
         private void HandlePaste()
         {
             if (EventListenerClipboardStorage.IsEmpty) return;
-            
+
             int targetArrayIdx = Mathf.Max(ListenersList.index, 0);
             ListenersList.serializedProperty.InsertArrayElementAtIndex(targetArrayIdx);
-            
+
             var targetProperty = ListenersList.serializedProperty.GetArrayElementAtIndex(ListenersList.count > 1 ? ListenersList.index + 1 : 0);
             ResetEventState(targetProperty);
-            
+
             EventListenerClipboardStorage.Extract(targetProperty);
-            
+
             ListenersList.index++;
             currentState.lastSelectedIndex++;
 
@@ -968,9 +931,9 @@
 
             RemoveCallback(ListenersList);
         }
-        
+
         #endregion
-        
+
         #region Methods (Keyboard Shortcuts)
 
         // This region contains methods which handle keyboard shortcuts (like Ctrl+C, Ctrl+V).
@@ -980,13 +943,11 @@
         /// </summary>
         private void HandleKeyboardShortcuts()
         {
-            if (!CachedSettings.hotkeysEnabled)
-                return;
+            if (!CachedSettings.hotkeysEnabled) return;
 
             Event currentEvent = Event.current;
 
-            if (!ListenersList.HasKeyboardControl())
-                return;
+            if (!ListenersList.HasKeyboardControl()) return;
 
             if (currentEvent.type == EventType.ValidateCommand)
             {
@@ -996,8 +957,7 @@
                     currentEvent.commandName == "Duplicate" ||
                     currentEvent.commandName == "Delete" ||
                     currentEvent.commandName == "SoftDelete" /*|| // NOTE: no more using Ctrl+A to add new, as it's an obscure shortcut (Ctrl+A is usually used to select all).
-                currentEvent.commandName == "SelectAll"*/)
-                    currentEvent.Use();
+                currentEvent.commandName == "SelectAll"*/) currentEvent.Use();
             }
             else if (currentEvent.type == EventType.ExecuteCommand)
             {
@@ -1054,16 +1014,16 @@
         private void HandleContextMenu(Rect rect, int listenerIndex)
         {
             var currentEvent = Event.current;
-            
+
             // If right mouse button was not released this frame, not displaying the menu
             if (currentEvent.type != EventType.MouseUp || currentEvent.button != 1) return;
-            
+
             // If right click was registered not over the given rect, not displaying the menu
             if (!rect.Contains(currentEvent.mousePosition)) return;
-            
+
             ListenersList.index = listenerIndex;
             currentEvent.Use();
-            
+
             // create the menu and add items to it
             var menu = new GenericMenu();
 
@@ -1071,19 +1031,16 @@
             {
                 // menu.AddItem(new GUIContent("Cut Callback"), false, HandleCut); // TODO: deletion doesn't work from here; fix later
                 menu.AddItem(new GUIContent("Copy Callback"), false, HandleCopy);
-                if (!EventListenerClipboardStorage.IsEmpty)
-                {
-                    menu.AddItem(new GUIContent("Paste Callback"), false, HandlePaste);
-                }
-                
+                if (!EventListenerClipboardStorage.IsEmpty) { menu.AddItem(new GUIContent("Paste Callback"), false, HandlePaste); }
+
                 menu.AddSeparator("");
-                
+
                 menu.AddItem(new GUIContent("Duplicate Callback"), false, HandleDuplicate);
                 // menu.AddItem(new GUIContent("Delete Callback"), false, HandleDelete); // TODO: deletion doesn't work from here; fix later
-                
+
                 menu.AddSeparator("");
             }
-            
+
             // Debug callback
             // if (false) // TODO: disable this menu item when one debugger callback is already present
             // {
@@ -1097,7 +1054,7 @@
             // display the menu
             menu.ShowAsContext();
         }
-        
+
         private void AddDebugger()
         {
             // Find debugger in the same scene as this UnityEvent is in
@@ -1109,7 +1066,7 @@
                 if (candidateDebugger.gameObject.scene != eventScene) continue;
                 debugger = candidateDebugger;
             }
-            
+
             // If no debugger found, create it manually
             if (debugger == null)
             {
@@ -1118,20 +1075,20 @@
                     hideFlags = HideFlags.NotEditable
                 };
                 debugger = debuggerObject.AddComponent<UnityEventDebugger>();
-                
+
                 // Move debugger to the scene this UnityEvent belongs to
                 SceneManager.MoveGameObjectToScene(debuggerObject, eventScene);
             }
-            
+
             // Add new callback with debugger in it
             ListenersList.serializedProperty.InsertArrayElementAtIndex(0);
-            
+
             var targetProperty = ListenersList.serializedProperty.GetArrayElementAtIndex(0);
             ResetEventState(targetProperty);
 
             var serializedTarget = targetProperty.FindPropertyRelative("m_Target");
             serializedTarget.objectReferenceValue = debugger;
-            
+
             ListenersList.index = 0;
             currentState.lastSelectedIndex = ListenersList.index;
 
@@ -1149,13 +1106,10 @@
         /// gets called only when adding debug logger (and to add debug logger you have to select this GameObject anyways).
         /// </remarks>
         /// <returns></returns>
-        private Scene GetThisEventScene()
-        {
-            return Selection.activeGameObject.scene;
-        }
+        private Scene GetThisEventScene() { return Selection.activeGameObject.scene; }
 
         #endregion
-        
+
         #region Methods (Utility)
 
         /// <summary>
@@ -1194,16 +1148,16 @@
             listenerArray = state.reorderableList.serializedProperty;
 
             // Setup dummy event
-#if UNITY_2018_4_OR_NEWER
+        #if UNITY_2018_4_OR_NEWER
             dummyEvent = GetDummyEvent(propertyForState);
-#else
+        #else
         string eventTypeName = currentProperty.FindPropertyRelative("m_TypeName").stringValue;
         System.Type eventType = ReorderableUnityEventHandler.FindTypeInAllAssemblies(eventTypeName);
         if (eventType == null)
             dummyEvent = new UnityEvent();
         else
             dummyEvent = System.Activator.CreateInstance(eventType) as UnityEventBase;
-#endif
+        #endif
 
             CachedSettings = ReorderableUnityEventHandler.GetEditorSettings();
         }
@@ -1250,7 +1204,7 @@
             }
 
         #if UNITY_2020_1_OR_NEWER
-            return findMethod.Invoke(eventObject, new object[] {functionName, targetObject?.GetType(), listenerMode, argType }) as MethodInfo;
+            return findMethod.Invoke(eventObject, new object[] { functionName, targetObject?.GetType(), listenerMode, argType }) as MethodInfo;
         #else
             return findMethod.Invoke(eventObject, new object[] {functionName, targetObject, listenerMode, argType }) as MethodInfo;
         #endif
@@ -1291,12 +1245,10 @@
         {
             MethodInfo methodInfo = InvokeFindMethod(functionName, targetObject, dummyEvent, listenerMode, argType);
 
-            if (methodInfo == null)
-                return "";
+            if (methodInfo == null) return "";
 
             ParameterInfo[] parameterInfos = methodInfo.GetParameters();
-            if (parameterInfos.Length == 0)
-                return "";
+            if (parameterInfos.Length == 0) return "";
 
             return GetTypeName(parameterInfos[0].ParameterType);
         }
@@ -1312,10 +1264,9 @@
         /// <returns></returns>
         protected string GetFunctionDisplayName(SerializedProperty objectProperty, SerializedProperty methodProperty, PersistentListenerMode listenerMode, Type argType, bool showArg)
         {
-            string methodNameOut = "No Function";
+            string methodNameOut = NoFunctionSelectedString;
 
-            if (objectProperty.objectReferenceValue == null || methodProperty.stringValue == "")
-                return methodNameOut;
+            if (objectProperty.objectReferenceValue == null || methodProperty.stringValue == "") return methodNameOut;
 
             MethodInfo methodInfo = InvokeFindMethod(methodProperty.stringValue, objectProperty.objectReferenceValue, dummyEvent, listenerMode, argType);
             string funcName = methodProperty.stringValue.StartsWith("set_") ? methodProperty.stringValue.Substring(4) : methodProperty.stringValue;
@@ -1375,15 +1326,12 @@
             {
                 if (methodData.targetMethod.Name.StartsWith("set_")) // If it's a property add the arg before the name
                     contentPath += argStr + " " + functionName;
-                else
-                    contentPath += functionName + " (" + argStr + ")"; // Add arguments
+                else contentPath += functionName + " (" + argStr + ")"; // Add arguments
             }
 
-            if (!methodData.targetMethod.IsPublic)
-                contentPath += " " + (methodData.targetMethod.IsPrivate ? "<private>" : "<internal>");
+            if (!methodData.targetMethod.IsPublic) contentPath += " " + (methodData.targetMethod.IsPrivate ? "<private>" : "<internal>");
 
-            if (methodData.targetMethod.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
-                contentPath += " <obsolete>";
+            if (methodData.targetMethod.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0) contentPath += " <obsolete>";
 
             methodData.listenerElement = elementProperty;
 
@@ -1393,7 +1341,7 @@
 
             bool itemOn = serializedTargetObject.objectReferenceValue == methodData.targetObject &&
                           serializedMethodName.stringValue == methodData.targetMethod.Name &&
-                          serializedMode.enumValueIndex == (int) methodData.listenerMode;
+                          serializedMode.enumValueIndex == (int)methodData.listenerMode;
 
             menu.AddItem(new GUIContent(contentPath), itemOn, SetEventFunctionCallback, methodData);
         }
@@ -1411,7 +1359,7 @@
 
             string currentMethodName = elementProperty.FindPropertyRelative("m_MethodName").stringValue;
 
-            menu.AddItem(new GUIContent("No Function"), string.IsNullOrEmpty(currentMethodName), ClearEventFunctionCallback, new FunctionData(elementProperty));
+            menu.AddItem(new GUIContent(NoFunctionSelectedString), string.IsNullOrEmpty(currentMethodName), ClearEventFunctionCallback, new FunctionData(elementProperty));
             menu.AddSeparator("");
 
             if (targetObj is Component) { targetObj = (targetObj as Component).gameObject; }
@@ -1429,8 +1377,7 @@
             var componentTypeCounts = new Dictionary<Type, ComponentTypeCount>();
 
             // Only get the first instance of each component type
-            if (CachedSettings.sameComponentTypesGrouped)
-                components = components.GroupBy(comp => comp.GetType()).Select(group => group.First()).ToArray();
+            if (CachedSettings.sameComponentTypesGrouped) components = components.GroupBy(comp => comp.GetType()).Select(group => group.First()).ToArray();
             else // Otherwise we need to know if there are multiple components of a given type before we start going through the components since we only need numbers on component types with multiple instances.
                 foreach (Component component in components)
                 {
@@ -1451,8 +1398,7 @@
                 if (!CachedSettings.sameComponentTypesGrouped)
                 {
                     ComponentTypeCount typeCount = componentTypeCounts[component.GetType()];
-                    if (typeCount.totalCount > 1)
-                        componentCount = typeCount.currentCount++;
+                    if (typeCount.totalCount > 1) componentCount = typeCount.currentCount++;
                 }
 
                 BuildMenuForObject(component, elementProperty, menu, componentCount);
@@ -1464,7 +1410,8 @@
         protected void BuildMenuForObject(Object targetObject, SerializedProperty elementProperty, GenericMenu menu, int componentCount = 0)
         {
             var methodInfos = new List<FunctionData>();
-            string contentPath = targetObject.GetType().Name + (componentCount > 0 ? string.Format("({0})", componentCount) : "") + "/";
+            string targetObjectTypeName = targetObject.GetType().Name;
+            string contentPath = targetObjectTypeName + (componentCount > 0 ? $"({componentCount})" : "") + "/";
 
             FindValidMethods(targetObject, PersistentListenerMode.Void, methodInfos);
             FindValidMethods(targetObject, PersistentListenerMode.Int, methodInfos);
@@ -1472,13 +1419,18 @@
             FindValidMethods(targetObject, PersistentListenerMode.String, methodInfos);
             FindValidMethods(targetObject, PersistentListenerMode.Bool, methodInfos);
             FindValidMethods(targetObject, PersistentListenerMode.Object, methodInfos);
-            
+
             methodInfos = methodInfos.OrderBy(method1 => method1.targetMethod.Name.StartsWith("set_") ? 0 : 1).ThenBy(method1 => method1.targetMethod.Name).ToList();
+
+            // Helper function to separate context menu entries in sections
+            void AddMenuSection(string headerText)
+            {
+                menu.AddDisabledItem(new GUIContent(contentPath + headerText));
+                menu.AddSeparator(contentPath);
+            }
 
             // Get event args to determine if we can do a pass through of the arg to the parameter
             Type[] eventArgs = dummyEvent.GetType().GetMethod("Invoke").GetParameters().Select(p => p.ParameterType).ToArray();
-
-            bool dynamicBinding = false;
 
             if (eventArgs.Length > 0)
             {
@@ -1489,24 +1441,35 @@
                 {
                     dynamicMethodInfos = dynamicMethodInfos.OrderBy(m => m.targetMethod.Name.StartsWith("set") ? 0 : 1).ThenBy(m => m.targetMethod.Name).ToList();
 
-                    dynamicBinding = true;
-
                     // Add dynamic header
-                    menu.AddDisabledItem(new GUIContent(contentPath + $"Dynamic {GetTypeName(eventArgs[0])}"));
-                    menu.AddSeparator(contentPath);
+                    AddMenuSection($"Dynamic <{GetTypeName(eventArgs[0])}> Callbacks");
 
                     foreach (FunctionData dynamicMethod in dynamicMethodInfos) { AddFunctionToMenu(contentPath, elementProperty, dynamicMethod, menu, 0, true); }
                 }
             }
 
-            // Add static header if we have dynamic bindings
-            if (dynamicBinding)
+            // Find all types in the type hierarchy of the target object
+            var targetObjectTypeHierarchy = new HashSet<Type>();
+            var targetObjectParentType = targetObject.GetType();
+            targetObjectTypeHierarchy.Add(targetObjectParentType);
+            while (targetObjectParentType != null)
             {
-                menu.AddDisabledItem(new GUIContent(contentPath + "Static Parameters"));
-                menu.AddSeparator(contentPath);
+                targetObjectParentType = targetObjectParentType.BaseType;
+                targetObjectTypeHierarchy.Add(targetObjectParentType);
             }
 
-            foreach (FunctionData method in methodInfos) { AddFunctionToMenu(contentPath, elementProperty, method, menu, componentCount); }
+            // Add object's methods for every type hierarchy level
+            foreach (var type in targetObjectTypeHierarchy)
+            {
+                var methodInfosFromThisType = methodInfos.FindAll(method => method.targetMethod.DeclaringType == type);
+                if (methodInfosFromThisType.Count == 0) continue;
+                
+                string sectionName = "Static Callbacks";
+                if (type != targetObject.GetType()) sectionName += $" (inherited from {type.Name})";
+                AddMenuSection(sectionName);
+
+                foreach (FunctionData method in methodInfosFromThisType) AddFunctionToMenu(contentPath, elementProperty, method, menu, componentCount);
+            }
         }
 
         #endregion
@@ -1572,10 +1535,7 @@
 
         #region Constructor
 
-        static ReorderableUnityEventHandler()
-        {
-            EditorApplication.update += OnEditorUpdate;
-        }
+        static ReorderableUnityEventHandler() { EditorApplication.update += OnEditorUpdate; }
 
         #endregion
 
@@ -1602,8 +1562,7 @@
             foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
             {
                 t = asm.GetType(qualifiedTypeName);
-                if (t != null)
-                    return t;
+                if (t != null) return t;
             }
 
             return null;
@@ -1637,16 +1596,10 @@
         /// <summary>
         ///     Applies
         /// </summary>
-        private static void OnEditorUpdate()
-        {
-            ApplyEventPropertyDrawerPatch();
-        }
+        private static void OnEditorUpdate() { ApplyEventPropertyDrawerPatch(); }
 
         [DidReloadScripts]
-        private static void OnScriptsReloaded()
-        {
-            ApplyEventPropertyDrawerPatch(true);
-        }
+        private static void OnScriptsReloaded() { ApplyEventPropertyDrawerPatch(true); }
 
         private static FieldInfo GetDrawerTypeMap()
         {
@@ -1824,7 +1777,7 @@
 
                 foreach (DictionaryEntry entry in drawerTypeMapDict)
                 {
-                    var drawerType = (Type) drawerField.GetValue(entry.Value);
+                    var drawerType = (Type)drawerField.GetValue(entry.Value);
 
                     if (drawerType.Name == "UnityEventDrawer" || drawerType.Name == "CollapsibleUnityEventDrawer") keysToRecreate.Add(entry.Key);
                 }
@@ -1835,7 +1788,7 @@
                 foreach (object keyToRecreate in keysToRecreate)
                 {
                     object newValMapping = Activator.CreateInstance(valType);
-                    typeField.SetValue(newValMapping, (Type) keyToRecreate);
+                    typeField.SetValue(newValMapping, (Type)keyToRecreate);
                     drawerField.SetValue(newValMapping, typeof(ReorderableUnityEventDrawer));
 
                     drawerTypeMapDict.Add(keyToRecreate, newValMapping);
@@ -1862,116 +1815,116 @@
         #endregion
     }
 
-// #if UNITY_2018_3_OR_NEWER
-//
-//     // Use the new settings provider class instead so we don't need to add extra stuff to the Edit menu
-//     // Using the IMGUI method
-//     /// <summary>
-//     ///     <see cref="SettingsProvider" /> for reorderable <see cref="UnityEvent" />s.
-//     ///     Allows to configure <see cref="ReorderableUnityEventDrawer" /> project-wide through Project Settings window.
-//     /// </summary>
-//     public static class ReorderableUnityEventSettingsProvider
-//     {
-//         [SettingsProvider]
-//         public static SettingsProvider CreateSettingsProvider()
-//         {
-//             var provider = new SettingsProvider("Project/Zinnia/Reorderable Unity Events", SettingsScope.Project)
-//             {
-//                 label = "Reorderable Unity Events",
-//
-//                 guiHandler = searchContext =>
-//                 {
-//                     ReorderableUnityEventHandler.ReorderableUnityEventSettings settings = ReorderableUnityEventHandler.GetEditorSettings();
-//
-//                     EditorGUI.BeginChangeCheck();
-//                     ReorderableUnityEventSettingsGUIContent.DrawSettingsButtons(settings);
-//
-//                     if (EditorGUI.EndChangeCheck())
-//                     {
-//                         ReorderableUnityEventHandler.SetEditorSettings(settings);
-//                         ReorderableUnityEventHandler.ApplyEventPropertyDrawerPatch(true);
-//                     }
-//                 },
-//
-//                 keywords = new HashSet<string>(new[] {"Zinnia", "Event", "UnityEvent", "Unity", "Reorderable"})
-//             };
-//
-//             return provider;
-//         }
-//     }
-//
-//     // TODO: everything inside following #else block below can be removed if this codee is not going to be used in versions earlier than 2018.3.
-//     //       As Zinnia supports only Unity 2018.3, removing it may make sense.
-// #else
-// public class ReorderableUnityEventSettings : EditorWindow
-// {
-//     [MenuItem("Edit/Easy Event Editor Settings")]
-//     static void Init()
-//     {
-//         ReorderableUnityEventSettings window = GetWindow<ReorderableUnityEventSettings>(false, "EEE Settings");
-//         window.minSize = new Vector2(350, 150);
-//         window.maxSize = new Vector2(350, 150);
-//         window.Show();
-//     }
-//
-//     private void OnGUI()
-//     {
-//         EditorGUILayout.Space();
-//         EditorGUILayout.LabelField("Easy Event Editor Settings", EditorStyles.boldLabel);
-//
-//         EditorGUILayout.Space();
-//
-//         ReorderableUnityEventHandler.EEESettings settings = ReorderableUnityEventHandler.GetEditorSettings();
-//
-//         EditorGUI.BeginChangeCheck();
-//         SettingsGUIContent.DrawSettingsButtons(settings);
-//
-//         if (EditorGUI.EndChangeCheck())
-//         {
-//             ReorderableUnityEventHandler.SetEditorSettings(settings);
-//             ReorderableUnityEventHandler.ApplyEventPropertyDrawerPatch(true);
-//         }
-//     }
-// }
-// #endif
-//
-//     /// <summary>
-//     ///     Static class with <see cref="GUIContent" /> for the reorderable events settings window.
-//     /// </summary>
-//     internal static class ReorderableUnityEventSettingsGUIContent
-//     {
-//         private static readonly GUIContent EnableToggleGuiContent = new GUIContent("Enable Reorderable Unity Events", "Replaces the default Unity event editing context with reorderable one");
-//
-//         private static readonly GUIContent EnablePrivateMembersGuiContent =
-//             new GUIContent("Show private properties and methods", "Exposes private/internal/obsolete properties and methods to the function list on events");
-//
-//         private static readonly GUIContent DisplayArgumentTypeContent = new GUIContent("Display argument type on function name", "Shows the argument that a function takes on the function header");
-//
-//         private static readonly GUIContent GroupSameComponentTypeContent = new GUIContent("Do not group components of the same type",
-//             "If you have multiple components of the same type on one object, show all of them in listener function selection list. Unity hides duplicate components by default.");
-//
-//         private static readonly GUIContent UseHotkeys = new GUIContent("Use hotkeys",
-//             "Adds common Unity hotkeys to event editor that operate on the currently selected event. The commands are Add (CTRL+A), Copy, Paste, Cut, Delete, and Duplicate");
-//
-//         public static void DrawSettingsButtons(ReorderableUnityEventHandler.ReorderableUnityEventSettings settings)
-//         {
-//             EditorGUILayout.Separator();
-//
-//             EditorGUI.indentLevel += 1;
-//
-//             settings.eventDrawerEnabled = EditorGUILayout.ToggleLeft(EnableToggleGuiContent, settings.eventDrawerEnabled);
-//             EditorGUILayout.Separator();
-//
-//             EditorGUI.BeginDisabledGroup(!settings.eventDrawerEnabled);
-//
-//             settings.privateMembersShown = EditorGUILayout.ToggleLeft(EnablePrivateMembersGuiContent, settings.privateMembersShown);
-//
-//             settings.argumentTypeDisplayed = EditorGUILayout.ToggleLeft(DisplayArgumentTypeContent, settings.argumentTypeDisplayed);
-//             settings.sameComponentTypesGrouped = !EditorGUILayout.ToggleLeft(GroupSameComponentTypeContent, !settings.sameComponentTypesGrouped);
-//             settings.hotkeysEnabled = EditorGUILayout.ToggleLeft(UseHotkeys, settings.hotkeysEnabled);
-//
-//             EditorGUI.EndDisabledGroup();
-//             EditorGUI.indentLevel -= 1;
-//         }
-//     }
+    // #if UNITY_2018_3_OR_NEWER
+    //
+    //     // Use the new settings provider class instead so we don't need to add extra stuff to the Edit menu
+    //     // Using the IMGUI method
+    //     /// <summary>
+    //     ///     <see cref="SettingsProvider" /> for reorderable <see cref="UnityEvent" />s.
+    //     ///     Allows to configure <see cref="ReorderableUnityEventDrawer" /> project-wide through Project Settings window.
+    //     /// </summary>
+    //     public static class ReorderableUnityEventSettingsProvider
+    //     {
+    //         [SettingsProvider]
+    //         public static SettingsProvider CreateSettingsProvider()
+    //         {
+    //             var provider = new SettingsProvider("Project/Zinnia/Reorderable Unity Events", SettingsScope.Project)
+    //             {
+    //                 label = "Reorderable Unity Events",
+    //
+    //                 guiHandler = searchContext =>
+    //                 {
+    //                     ReorderableUnityEventHandler.ReorderableUnityEventSettings settings = ReorderableUnityEventHandler.GetEditorSettings();
+    //
+    //                     EditorGUI.BeginChangeCheck();
+    //                     ReorderableUnityEventSettingsGUIContent.DrawSettingsButtons(settings);
+    //
+    //                     if (EditorGUI.EndChangeCheck())
+    //                     {
+    //                         ReorderableUnityEventHandler.SetEditorSettings(settings);
+    //                         ReorderableUnityEventHandler.ApplyEventPropertyDrawerPatch(true);
+    //                     }
+    //                 },
+    //
+    //                 keywords = new HashSet<string>(new[] {"Zinnia", "Event", "UnityEvent", "Unity", "Reorderable"})
+    //             };
+    //
+    //             return provider;
+    //         }
+    //     }
+    //
+    //     // TODO: everything inside following #else block below can be removed if this codee is not going to be used in versions earlier than 2018.3.
+    //     //       As Zinnia supports only Unity 2018.3, removing it may make sense.
+    // #else
+    // public class ReorderableUnityEventSettings : EditorWindow
+    // {
+    //     [MenuItem("Edit/Easy Event Editor Settings")]
+    //     static void Init()
+    //     {
+    //         ReorderableUnityEventSettings window = GetWindow<ReorderableUnityEventSettings>(false, "EEE Settings");
+    //         window.minSize = new Vector2(350, 150);
+    //         window.maxSize = new Vector2(350, 150);
+    //         window.Show();
+    //     }
+    //
+    //     private void OnGUI()
+    //     {
+    //         EditorGUILayout.Space();
+    //         EditorGUILayout.LabelField("Easy Event Editor Settings", EditorStyles.boldLabel);
+    //
+    //         EditorGUILayout.Space();
+    //
+    //         ReorderableUnityEventHandler.EEESettings settings = ReorderableUnityEventHandler.GetEditorSettings();
+    //
+    //         EditorGUI.BeginChangeCheck();
+    //         SettingsGUIContent.DrawSettingsButtons(settings);
+    //
+    //         if (EditorGUI.EndChangeCheck())
+    //         {
+    //             ReorderableUnityEventHandler.SetEditorSettings(settings);
+    //             ReorderableUnityEventHandler.ApplyEventPropertyDrawerPatch(true);
+    //         }
+    //     }
+    // }
+    // #endif
+    //
+    //     /// <summary>
+    //     ///     Static class with <see cref="GUIContent" /> for the reorderable events settings window.
+    //     /// </summary>
+    //     internal static class ReorderableUnityEventSettingsGUIContent
+    //     {
+    //         private static readonly GUIContent EnableToggleGuiContent = new GUIContent("Enable Reorderable Unity Events", "Replaces the default Unity event editing context with reorderable one");
+    //
+    //         private static readonly GUIContent EnablePrivateMembersGuiContent =
+    //             new GUIContent("Show private properties and methods", "Exposes private/internal/obsolete properties and methods to the function list on events");
+    //
+    //         private static readonly GUIContent DisplayArgumentTypeContent = new GUIContent("Display argument type on function name", "Shows the argument that a function takes on the function header");
+    //
+    //         private static readonly GUIContent GroupSameComponentTypeContent = new GUIContent("Do not group components of the same type",
+    //             "If you have multiple components of the same type on one object, show all of them in listener function selection list. Unity hides duplicate components by default.");
+    //
+    //         private static readonly GUIContent UseHotkeys = new GUIContent("Use hotkeys",
+    //             "Adds common Unity hotkeys to event editor that operate on the currently selected event. The commands are Add (CTRL+A), Copy, Paste, Cut, Delete, and Duplicate");
+    //
+    //         public static void DrawSettingsButtons(ReorderableUnityEventHandler.ReorderableUnityEventSettings settings)
+    //         {
+    //             EditorGUILayout.Separator();
+    //
+    //             EditorGUI.indentLevel += 1;
+    //
+    //             settings.eventDrawerEnabled = EditorGUILayout.ToggleLeft(EnableToggleGuiContent, settings.eventDrawerEnabled);
+    //             EditorGUILayout.Separator();
+    //
+    //             EditorGUI.BeginDisabledGroup(!settings.eventDrawerEnabled);
+    //
+    //             settings.privateMembersShown = EditorGUILayout.ToggleLeft(EnablePrivateMembersGuiContent, settings.privateMembersShown);
+    //
+    //             settings.argumentTypeDisplayed = EditorGUILayout.ToggleLeft(DisplayArgumentTypeContent, settings.argumentTypeDisplayed);
+    //             settings.sameComponentTypesGrouped = !EditorGUILayout.ToggleLeft(GroupSameComponentTypeContent, !settings.sameComponentTypesGrouped);
+    //             settings.hotkeysEnabled = EditorGUILayout.ToggleLeft(UseHotkeys, settings.hotkeysEnabled);
+    //
+    //             EditorGUI.EndDisabledGroup();
+    //             EditorGUI.indentLevel -= 1;
+    //         }
+    //     }
 }

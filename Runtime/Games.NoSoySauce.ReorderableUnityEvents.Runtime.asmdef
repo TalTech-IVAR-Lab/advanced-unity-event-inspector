@@ -1,12 +1,8 @@
 {
-    "name": "Games.NoSoySauce.ReorderableUnityEvents.Editor",
+    "name": "Games.NoSoySauce.ReorderableUnityEvents.Runtime",
     "rootNamespace": "",
-    "references": [
-        "GUID:2478544ad99cbda4da6c1c41df2c1a3b"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "references": [],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
