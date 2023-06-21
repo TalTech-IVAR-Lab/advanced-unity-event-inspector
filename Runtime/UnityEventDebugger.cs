@@ -1,4 +1,4 @@
-﻿namespace Games.NoSoySauce.DeveloperTools.Components
+﻿namespace EE.TalTech.IVAR.AdvancedUnityEventInspector.Components
 {
     using System;
     using System.Diagnostics;
