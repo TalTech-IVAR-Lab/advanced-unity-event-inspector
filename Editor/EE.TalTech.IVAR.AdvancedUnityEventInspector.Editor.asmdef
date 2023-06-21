@@ -1,5 +1,5 @@
 {
-    "name": "Games.NoSoySauce.ReorderableUnityEvents.Editor",
+    "name": "EE.TalTech.IVAR.AdvancedUnityEventInspector.Editor",
     "rootNamespace": "",
     "references": [
         "GUID:2478544ad99cbda4da6c1c41df2c1a3b"
