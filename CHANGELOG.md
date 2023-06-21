@@ -1,3 +1,14 @@
+## [2.0.0](https://github.com/TalTech-IVAR-Lab/advanced-unity-event-inspector/compare/v1.2.0...v2.0.0) (2023-06-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* Default package namespace has been changed
+
+### 🛠 Fixes
+
+* Change default namespace to EE.TalTech.IVAR.AdvancedUnityEventInspector ([d087401](https://github.com/TalTech-IVAR-Lab/advanced-unity-event-inspector/commit/d087401ca4141cdd57bb5f15e52b868952afbd10))
+
 ## [1.2.0](https://gitlab.com/NoSoySauce_Games/Reorderable-Unity-Events/compare/v1.1.0...v1.2.0) (2022-05-20)
 
 

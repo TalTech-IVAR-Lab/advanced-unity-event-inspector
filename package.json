@@ -1,6 +1,6 @@
 {
   "name": "ee.taltech.ivar.advanced-unity-event-inspector",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "displayName": "Advanced Unity Event Inspector",
   "description": "Makes Unity Event callbacks reorderable and allows to copy, cut and paste them between events in the Inspector.",
   "unity": "2019.1",
