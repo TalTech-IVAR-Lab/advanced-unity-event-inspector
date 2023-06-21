@@ -1,22 +1,22 @@
-﻿namespace Games.NoSoySauce.DeveloperTools.ReorderableUnityEvents
-{
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using System.Text;
-    using Components;
-    using UnityEditor;
-    using UnityEditor.Callbacks;
-    using UnityEditorInternal;
-    using UnityEngine;
-    using UnityEngine.Events;
-    using UnityEngine.EventSystems;
-    using UnityEngine.SceneManagement;
-    using Object = UnityEngine.Object;
-    using Random = UnityEngine.Random;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using EE.TalTech.IVAR.AdvancedUnityEventInspector.Components;
+using UnityEditor;
+using UnityEditor.Callbacks;
+using UnityEditorInternal;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
+namespace EE.TalTech.IVAR.AdvancedUnityEventInspector
+{
     /// <summary>
     ///     Displays a custom reorderable inspector collection in a collapsible drawer.
     /// </summary>
@@ -81,7 +81,7 @@
         private static readonly Color FocusedColor = new Color(0.172549f, 0.3647059f, 0.5294118f);
 
         private const string NoFunctionSelectedString = "No Function";
-        
+
         #endregion
 
         #region Static Methods (UnityEvent Logic)
@@ -224,7 +224,7 @@
             return rects;
         }
 
-    #if UNITY_2018_4_OR_NEWER
+#if UNITY_2018_4_OR_NEWER
         /// <summary>
         ///     TODO: docs
         /// </summary>
@@ -284,7 +284,7 @@
 
             return dummyEvent;
         }
-    #endif
+#endif
 
         /// <summary>
         ///     Gets object type corresponding to the given <see cref="PersistentListenerMode" />.
@@ -667,13 +667,20 @@
                                 componentCount++;
                             }
 
-                            if (newComponentList.Length > 0 && newComponentList[newComponentIndex].GetType() == oldTargetObject.GetType()) serializedTarget.objectReferenceValue = newComponentList[newComponentIndex];
+                            if (newComponentList.Length > 0 && newComponentList[newComponentIndex].GetType() == oldTargetObject.GetType())
+                                serializedTarget.objectReferenceValue = newComponentList[newComponentIndex];
                             else serializedMethod.stringValue = null;
                         }
-                        else { serializedMethod.stringValue = null; }
+                        else
+                        {
+                            serializedMethod.stringValue = null;
+                        }
                     }
                 }
-                else { serializedMethod.stringValue = null; }
+                else
+                {
+                    serializedMethod.stringValue = null;
+                }
             }
 
             var mode = (PersistentListenerMode)serializedMode.enumValueIndex;
@@ -704,7 +711,10 @@
                 Object result = EditorGUI.ObjectField(argRect, GUIContent.none, argument.objectReferenceValue, argType, true);
                 if (EditorGUI.EndChangeCheck()) argument.objectReferenceValue = result;
             }
-            else if (mode != PersistentListenerMode.Void && mode != PersistentListenerMode.EventDefined) { EditorGUI.PropertyField(argRect, argument, GUIContent.none); }
+            else if (mode != PersistentListenerMode.Void && mode != PersistentListenerMode.EventDefined)
+            {
+                EditorGUI.PropertyField(argRect, argument, GUIContent.none);
+            }
 
             EditorGUI.BeginDisabledGroup(serializedTarget.objectReferenceValue == null);
             {
@@ -712,7 +722,10 @@
 
                 GUIContent buttonContent;
 
-                if (EditorGUI.showMixedValue) { buttonContent = new GUIContent("\u2014", "Mixed Values"); }
+                if (EditorGUI.showMixedValue)
+                {
+                    buttonContent = new GUIContent("\u2014", "Mixed Values");
+                }
                 else
                 {
                     if (serializedTarget.objectReferenceValue == null || string.IsNullOrEmpty(serializedMethod.stringValue)) buttonContent = new GUIContent(NoFunctionSelectedString);
@@ -730,7 +743,10 @@
         ///     Called when a listener of the UnityEvent becomes selected.
         /// </summary>
         /// <param name="list">Reorderable list which sent the callback.</param>
-        protected virtual void SelectEventListenerCallback(ReorderableList list) { currentState.lastSelectedIndex = list.index; }
+        protected virtual void SelectEventListenerCallback(ReorderableList list)
+        {
+            currentState.lastSelectedIndex = list.index;
+        }
 
         /// <summary>
         ///     Called when a new listener gets added to UnityEvent.
@@ -752,7 +768,10 @@
                 listenerArray.serializedObject.Update();
                 list.index = list.serializedProperty.arraySize - 1;
             }
-            else { ReorderableList.defaultBehaviours.DoAddButton(list); }
+            else
+            {
+                ReorderableList.defaultBehaviours.DoAddButton(list);
+            }
 
             currentState.lastSelectedIndex = list.index;
 
@@ -765,7 +784,10 @@
         ///     Called when listeners of UnityEvent get reordered.
         /// </summary>
         /// <param name="list">Reorderable list which sent the callback.</param>
-        protected virtual void ReorderCallback(ReorderableList list) { currentState.lastSelectedIndex = list.index; }
+        protected virtual void ReorderCallback(ReorderableList list)
+        {
+            currentState.lastSelectedIndex = list.index;
+        }
 
         /// <summary>
         ///     Called when a listener gets removed from UnityEvent.
@@ -1031,7 +1053,10 @@
             {
                 // menu.AddItem(new GUIContent("Cut Callback"), false, HandleCut); // TODO: deletion doesn't work from here; fix later
                 menu.AddItem(new GUIContent("Copy Callback"), false, HandleCopy);
-                if (!EventListenerClipboardStorage.IsEmpty) { menu.AddItem(new GUIContent("Paste Callback"), false, HandlePaste); }
+                if (!EventListenerClipboardStorage.IsEmpty)
+                {
+                    menu.AddItem(new GUIContent("Paste Callback"), false, HandlePaste);
+                }
 
                 menu.AddSeparator("");
 
@@ -1106,7 +1131,10 @@
         /// gets called only when adding debug logger (and to add debug logger you have to select this GameObject anyways).
         /// </remarks>
         /// <returns></returns>
-        private Scene GetThisEventScene() { return Selection.activeGameObject.scene; }
+        private Scene GetThisEventScene()
+        {
+            return Selection.activeGameObject.scene;
+        }
 
         #endregion
 
@@ -1148,16 +1176,16 @@
             listenerArray = state.reorderableList.serializedProperty;
 
             // Setup dummy event
-        #if UNITY_2018_4_OR_NEWER
+#if UNITY_2018_4_OR_NEWER
             dummyEvent = GetDummyEvent(propertyForState);
-        #else
+#else
         string eventTypeName = currentProperty.FindPropertyRelative("m_TypeName").stringValue;
         System.Type eventType = ReorderableUnityEventHandler.FindTypeInAllAssemblies(eventTypeName);
         if (eventType == null)
             dummyEvent = new UnityEvent();
         else
             dummyEvent = System.Activator.CreateInstance(eventType) as UnityEventBase;
-        #endif
+#endif
 
             CachedSettings = ReorderableUnityEventHandler.GetEditorSettings();
         }
@@ -1184,11 +1212,11 @@
                     new[]
                     {
                         typeof(string),
-                    #if UNITY_2020_1_OR_NEWER
+#if UNITY_2020_1_OR_NEWER
                         typeof(Type),
-                    #else
+#else
                         typeof(object),
-                    #endif
+#endif
                         typeof(PersistentListenerMode),
                         typeof(Type)
                     },
@@ -1203,11 +1231,11 @@
                 return null;
             }
 
-        #if UNITY_2020_1_OR_NEWER
+#if UNITY_2020_1_OR_NEWER
             return findMethod.Invoke(eventObject, new object[] { functionName, targetObject?.GetType(), listenerMode, argType }) as MethodInfo;
-        #else
+#else
             return findMethod.Invoke(eventObject, new object[] {functionName, targetObject, listenerMode, argType }) as MethodInfo;
-        #endif
+#endif
         }
 
         private Type[] GetEventParams(UnityEventBase eventIn)
@@ -1224,7 +1252,10 @@
             // Get pretty type name for each argument
             int typeCount = methodTypes.Length;
             var methodTypeStrings = new string[typeCount];
-            for (int i = 0; i < typeCount; i++) { methodTypeStrings[i] = GetTypeName(methodTypes[i]); }
+            for (int i = 0; i < typeCount; i++)
+            {
+                methodTypeStrings[i] = GetTypeName(methodTypes[i]);
+            }
 
             builder.Append("(");
             builder.Append(string.Join(", ", methodTypeStrings));
@@ -1307,7 +1338,10 @@
                 string functionArgStr = GetFunctionArgStr(methodProperty.stringValue, objectProperty.objectReferenceValue, listenerMode, argType);
                 methodNameOut = $"{objectTypeName}.{funcName} ({functionArgStr})";
             }
-            else { methodNameOut = $"{objectTypeName}.{funcName}"; }
+            else
+            {
+                methodNameOut = $"{objectTypeName}.{funcName}";
+            }
 
 
             return methodNameOut;
@@ -1362,7 +1396,10 @@
             menu.AddItem(new GUIContent(NoFunctionSelectedString), string.IsNullOrEmpty(currentMethodName), ClearEventFunctionCallback, new FunctionData(elementProperty));
             menu.AddSeparator("");
 
-            if (targetObj is Component) { targetObj = (targetObj as Component).gameObject; }
+            if (targetObj is Component)
+            {
+                targetObj = (targetObj as Component).gameObject;
+            }
             else if (!(targetObj is GameObject))
             {
                 // Function menu for asset objects and such
@@ -1444,7 +1481,10 @@
                     // Add dynamic header
                     AddMenuSection($"Dynamic <{GetTypeName(eventArgs[0])}> Callbacks");
 
-                    foreach (FunctionData dynamicMethod in dynamicMethodInfos) { AddFunctionToMenu(contentPath, elementProperty, dynamicMethod, menu, 0, true); }
+                    foreach (FunctionData dynamicMethod in dynamicMethodInfos)
+                    {
+                        AddFunctionToMenu(contentPath, elementProperty, dynamicMethod, menu, 0, true);
+                    }
                 }
             }
 
@@ -1463,7 +1503,7 @@
             {
                 var methodInfosFromThisType = methodInfos.FindAll(method => method.targetMethod.DeclaringType == type);
                 if (methodInfosFromThisType.Count == 0) continue;
-                
+
                 string sectionName = "Static Callbacks";
                 if (type != targetObject.GetType()) sectionName += $" (inherited from {type.Name})";
                 AddMenuSection(sectionName);
@@ -1535,7 +1575,10 @@
 
         #region Constructor
 
-        static ReorderableUnityEventHandler() { EditorApplication.update += OnEditorUpdate; }
+        static ReorderableUnityEventHandler()
+        {
+            EditorApplication.update += OnEditorUpdate;
+        }
 
         #endregion
 
@@ -1596,10 +1639,16 @@
         /// <summary>
         ///     Applies
         /// </summary>
-        private static void OnEditorUpdate() { ApplyEventPropertyDrawerPatch(); }
+        private static void OnEditorUpdate()
+        {
+            ApplyEventPropertyDrawerPatch();
+        }
 
         [DidReloadScripts]
-        private static void OnScriptsReloaded() { ApplyEventPropertyDrawerPatch(true); }
+        private static void OnScriptsReloaded()
+        {
+            ApplyEventPropertyDrawerPatch(true);
+        }
 
         private static FieldInfo GetDrawerTypeMap()
         {
@@ -1782,7 +1831,10 @@
                     if (drawerType.Name == "UnityEventDrawer" || drawerType.Name == "CollapsibleUnityEventDrawer") keysToRecreate.Add(entry.Key);
                 }
 
-                foreach (object keyToKill in keysToRecreate) { drawerTypeMapDict.Remove(keyToKill); }
+                foreach (object keyToKill in keysToRecreate)
+                {
+                    drawerTypeMapDict.Remove(keyToKill);
+                }
 
                 // Recreate these key-value pairs since they are structs
                 foreach (object keyToRecreate in keysToRecreate)

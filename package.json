@@ -1,13 +1,13 @@
 {
-  "name": "games.nosoysauce.reorderableunityevents",
+  "name": "ee.taltech.ivar.advanced-unity-event-inspector",
   "version": "1.2.0",
-  "displayName": "Reorderable Unity Events",
-  "description": "Makes Unity Events callbacks reorderable and allows to copy, cut and paste them between events in the Inspector.",
+  "displayName": "Advanced Unity Event Inspector",
+  "description": "Makes Unity Event callbacks reorderable and allows to copy, cut and paste them between events in the Inspector.",
   "unity": "2019.1",
   "keywords": [
+    "unity",
     "events",
-    "reorderable",
-    "unity"
+    "reorderable"
   ],
   "author": {
     "name": "Yevhen Bondarenko",
